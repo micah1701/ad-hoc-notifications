@@ -1,32 +1,33 @@
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useCallback } from 'react';
+import { StyleSheet } from 'react-native';
+import {
+  Camera,
+  isScannedCode,
+  useObjectOutput,
+} from 'react-native-vision-camera';
+import type { ScannedObject } from 'react-native-vision-camera';
 
 interface Props {
   onScan: (value: string) => void;
 }
 
-export default function QrScanner(_props: Props) {
+export default function QrScanner({ onScan }: Props) {
+  const onObjectsScanned = useCallback(
+    (objects: ScannedObject[]) => {
+      const code = objects.find(isScannedCode);
+      if (code?.value) onScan(code.value);
+    },
+    [onScan],
+  );
+
+  const objectOutput = useObjectOutput({ types: ['qr'], onObjectsScanned });
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.text}>
-        QR scanning is not available on this device.{'\n'}Use the link field
-        below.
-      </Text>
-    </View>
+    <Camera
+      device="back"
+      isActive
+      outputs={[objectOutput]}
+      style={StyleSheet.absoluteFill}
+    />
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    ...StyleSheet.absoluteFillObject,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 16,
-  },
-  text: {
-    fontSize: 13,
-    color: '#9ca3af',
-    textAlign: 'center',
-    lineHeight: 20,
-  },
-});
