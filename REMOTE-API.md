@@ -9,7 +9,7 @@ POST /api/auth/login
 ```
 {
     "email" : "user_email@email.com",
-    "passowrd": "usersPassWord"
+    "password": "usersPassWord"
 }
 ```
 

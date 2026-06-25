@@ -4,6 +4,7 @@ import type { StoredNotification } from '../types/notification';
 const NOTIFICATIONS_KEY = '@adhoc/notifications';
 const DEVICE_REGISTERED_KEY = '@adhoc/device_registered';
 const API_BASE_URL_KEY = '@adhoc/api_base_url';
+const AUTH_TOKEN_KEY = '@adhoc/auth_token';
 const MAX_STORED = 200;
 
 export async function getRegistrationState(): Promise<{
@@ -58,4 +59,24 @@ export async function addNotification(
 
 export async function clearNotifications(): Promise<void> {
   await AsyncStorage.setItem(NOTIFICATIONS_KEY, JSON.stringify([]));
+}
+
+export async function getAuthToken(): Promise<string | null> {
+  try {
+    return await AsyncStorage.getItem(AUTH_TOKEN_KEY);
+  } catch {
+    return null;
+  }
+}
+
+export async function saveAuthToken(token: string): Promise<void> {
+  await AsyncStorage.setItem(AUTH_TOKEN_KEY, token);
+}
+
+export async function clearAuthToken(): Promise<void> {
+  await AsyncStorage.removeItem(AUTH_TOKEN_KEY);
+}
+
+export async function clearRegistrationState(): Promise<void> {
+  await AsyncStorage.multiRemove([DEVICE_REGISTERED_KEY, API_BASE_URL_KEY, AUTH_TOKEN_KEY]);
 }

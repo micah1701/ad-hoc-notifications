@@ -2,6 +2,7 @@ import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 
 export type RootTabParamList = {
   Notifications: undefined;
+  Account: undefined;
 };
 
 export type RootTabScreenProps<T extends keyof RootTabParamList> =

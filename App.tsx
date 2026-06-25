@@ -97,7 +97,7 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <NavigationContainer>
-        <AppNavigator />
+        <AppNavigator onDeviceUnregistered={() => setBootState('unregistered')} />
       </NavigationContainer>
     </SafeAreaProvider>
   );
