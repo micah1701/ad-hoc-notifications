@@ -20,3 +20,14 @@ buildscript {
 }
 
 apply plugin: "com.facebook.react.rootproject"
+
+// RN plugin's Java version alignment is disabled (see gradle.properties).
+// This replaces it: configureEach is lazy and fires at task-execution time,
+// so it avoids the "already evaluated" error that afterEvaluate hits when
+// autolinkLibrariesWithApp() forces eager subproject evaluation.
+subprojects {
+    tasks.withType(JavaCompile).configureEach {
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
+    }
+}
