@@ -21,13 +21,22 @@ buildscript {
 
 apply plugin: "com.facebook.react.rootproject"
 
-// RN plugin's Java version alignment is disabled (see gradle.properties).
-// This replaces it: configureEach is lazy and fires at task-execution time,
-// so it avoids the "already evaluated" error that afterEvaluate hits when
-// autolinkLibrariesWithApp() forces eager subproject evaluation.
+// Library subprojects (e.g. async-storage) set compileOptions.sourceCompatibility = 1.8.
+// KGP 2.1+ reads sourceCompatibility to pick a default jvmTarget. If any configureEach
+// temporarily set sourceCompatibility = 21 before AGP resets it to 1.8, KGP latches onto
+// 21 while Java ends up at 1.8 — producing the "Inconsistent JVM-target" error.
+// Fix: explicitly pin Kotlin jvmTarget to JVM_1_8 for all non-app modules via
+// plugins.withId (fires right after the Kotlin plugin is applied, before any task
+// realization). The :app module is excluded; its kotlin { jvmToolchain(21) } block
+// handles the target directly.
 subprojects {
-    tasks.withType(JavaCompile).configureEach {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
+    if (project.name != "app") {
+        plugins.withId("org.jetbrains.kotlin.android") {
+            kotlin {
+                compilerOptions {
+                    jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_1_8)
+                }
+            }
+        }
     }
 }

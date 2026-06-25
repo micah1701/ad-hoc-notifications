@@ -29,7 +29,11 @@ class NotificationService {
     if (Platform.OS !== 'android') return;
     await this.requestPermission();
     await this.createNotificationChannel();
-    this.setupTokenRefresh();
+    try {
+      this.setupTokenRefresh();
+    } catch (err) {
+      console.warn('FCM token refresh setup failed (Play Services unavailable?):', err);
+    }
   }
 
   private async requestPermission(): Promise<void> {
