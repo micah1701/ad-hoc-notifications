@@ -36,10 +36,12 @@ export async function listNotifications(
   token: string,
   limit = 50,
   offset = 0,
+  pushToken?: string,
 ): Promise<RemoteNotification[]> {
   const url = new URL(`${REMOTE_API_BASE}/api/notifications`);
   url.searchParams.set('limit', String(limit));
   url.searchParams.set('offset', String(offset));
+  if (pushToken) url.searchParams.set('push_token', pushToken);
   const response = await fetch(url.toString(), {
     headers: { Authorization: `Bearer ${token}` },
   });

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Alert,
   KeyboardAvoidingView,
@@ -10,17 +10,35 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import Clipboard from '@react-native-clipboard/clipboard';
+import { useNavigation } from '@react-navigation/native';
+import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { useAuth } from '../contexts/AuthContext';
 import { unregisterDevice } from '../services/api';
-import { clearRegistrationState } from '../services/storage';
+import { clearRegistrationState, getPushToken } from '../services/storage';
 import NotificationService from '../services/NotificationService';
+import type { RootTabParamList } from '../types/navigation';
 
 export function AccountScreen() {
   const { isLoggedIn, token, login, logout, onDeviceUnregistered } = useAuth();
+  const navigation = useNavigation<BottomTabNavigationProp<RootTabParamList>>();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [pushToken, setPushToken] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    getPushToken().then(setPushToken);
+  }, []);
+
+  const handleCopyDeviceId = () => {
+    if (!pushToken) return;
+    Clipboard.setString(pushToken);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   const handleLogin = async () => {
     if (!email.trim() || !password) return;
@@ -69,6 +87,11 @@ export function AccountScreen() {
   if (isLoggedIn) {
     return (
       <View style={styles.container}>
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('Notifications')}>
+          <Text style={styles.backArrow}>←</Text>
+          <Text style={styles.backLabel}>Notifications</Text>
+        </TouchableOpacity>
+
         <View style={styles.section}>
           <View style={styles.loggedInBadge}>
             <Text style={styles.loggedInIcon}>✓</Text>
@@ -84,6 +107,20 @@ export function AccountScreen() {
         </TouchableOpacity>
 
         <View style={styles.divider} />
+
+        {pushToken != null && (
+          <View style={styles.deviceIdRow}>
+            <Text style={styles.deviceIdLabel}>Device ID</Text>
+            <View style={styles.deviceIdValueRow}>
+              <Text style={styles.deviceIdValue} numberOfLines={1} ellipsizeMode="middle">
+                {pushToken}
+              </Text>
+              <TouchableOpacity onPress={handleCopyDeviceId} style={styles.copyButton}>
+                <Text style={styles.copyIcon}>{copied ? '✓' : '📋'}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
 
         <View style={styles.dangerSection}>
           <Text style={styles.dangerTitle}>Danger Zone</Text>
@@ -223,6 +260,49 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
   // Logged-in state
+  backButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+    gap: 4,
+  },
+  backArrow: {
+    fontSize: 16,
+    color: '#3b82f6',
+  },
+  backLabel: {
+    fontSize: 14,
+    color: '#3b82f6',
+    fontWeight: '500',
+  },
+  deviceIdRow: {
+    marginBottom: 16,
+  },
+  deviceIdLabel: {
+    fontSize: 11,
+    fontWeight: '500',
+    color: '#9ca3af',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: 4,
+  },
+  deviceIdValueRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  deviceIdValue: {
+    flex: 1,
+    fontSize: 11,
+    color: '#6b7280',
+    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
+  },
+  copyButton: {
+    padding: 4,
+  },
+  copyIcon: {
+    fontSize: 16,
+  },
   section: {
     backgroundColor: '#ffffff',
     borderRadius: 12,

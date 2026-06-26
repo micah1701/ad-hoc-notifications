@@ -13,6 +13,7 @@ import NotificationService from './src/services/NotificationService';
 import {
   addNotification,
   getRegistrationState,
+  savePushToken,
 } from './src/services/storage';
 import { sendHeartbeat } from './src/services/api';
 
@@ -28,6 +29,7 @@ export default function App() {
       await NotificationService.getInstance().initialize();
 
       const token = await NotificationService.getInstance().getFCMToken();
+      if (token) savePushToken(token).catch(() => {});
       const { isRegistered, apiBaseUrl } = await getRegistrationState();
 
       if (cancelled) return;

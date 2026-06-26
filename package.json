@@ -12,6 +12,7 @@
   "dependencies": {
     "@notifee/react-native": "^9.1.8",
     "@react-native-async-storage/async-storage": "^3.1.1",
+    "@react-native-clipboard/clipboard": "^1.16.3",
     "@react-native-firebase/app": "^25.0.1",
     "@react-native-firebase/messaging": "^25.0.1",
     "@react-native/new-app-screen": "0.86.0",
@@ -19,6 +20,7 @@
     "@react-navigation/native": "^7.3.4",
     "react": "19.2.3",
     "react-native": "0.86.0",
+    "react-native-camera-kit": "^18.0.0",
     "react-native-nitro-image": "^0.15.1",
     "react-native-nitro-modules": "^0.35.10",
     "react-native-safe-area-context": "^5.8.0",

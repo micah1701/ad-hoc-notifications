@@ -17,7 +17,7 @@ import {
   markNotificationRead,
 } from '../services/api';
 import NotificationService from '../services/NotificationService';
-import { loadNotifications } from '../services/storage';
+import { getPushToken, loadNotifications } from '../services/storage';
 import type { RemoteNotification, StoredNotification } from '../types/notification';
 import type { RootTabScreenProps } from '../types/navigation';
 
@@ -66,7 +66,8 @@ export function NotificationsScreen(_props: Props) {
       if (!token) return;
       const offset = reset ? 0 : offsetRef.current;
       try {
-        const page = await listNotifications(token, PAGE_SIZE, offset);
+        const pushToken = await getPushToken();
+        const page = await listNotifications(token, PAGE_SIZE, offset, pushToken ?? undefined);
         const items = page.map(remoteToItem);
         setRemoteItems(prev => (reset ? items : [...prev, ...items]));
         offsetRef.current = offset + items.length;

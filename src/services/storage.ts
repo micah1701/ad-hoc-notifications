@@ -5,6 +5,7 @@ const NOTIFICATIONS_KEY = '@adhoc/notifications';
 const DEVICE_REGISTERED_KEY = '@adhoc/device_registered';
 const API_BASE_URL_KEY = '@adhoc/api_base_url';
 const AUTH_TOKEN_KEY = '@adhoc/auth_token';
+const PUSH_TOKEN_KEY = '@adhoc/push_token';
 const MAX_STORED = 200;
 
 export async function getRegistrationState(): Promise<{
@@ -78,5 +79,17 @@ export async function clearAuthToken(): Promise<void> {
 }
 
 export async function clearRegistrationState(): Promise<void> {
-  await AsyncStorage.multiRemove([DEVICE_REGISTERED_KEY, API_BASE_URL_KEY, AUTH_TOKEN_KEY]);
+  await AsyncStorage.removeMany([DEVICE_REGISTERED_KEY, API_BASE_URL_KEY, AUTH_TOKEN_KEY, PUSH_TOKEN_KEY]);
+}
+
+export async function getPushToken(): Promise<string | null> {
+  try {
+    return await AsyncStorage.getItem(PUSH_TOKEN_KEY);
+  } catch {
+    return null;
+  }
+}
+
+export async function savePushToken(token: string): Promise<void> {
+  await AsyncStorage.setItem(PUSH_TOKEN_KEY, token);
 }

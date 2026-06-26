@@ -8,7 +8,7 @@ import {
 import { PermissionsAndroid } from 'react-native';
 import notifee, { AndroidImportance } from '@notifee/react-native';
 import type { StoredNotification } from '../types/notification';
-import { addNotification } from './storage';
+import { addNotification, savePushToken } from './storage';
 import { heartbeatWithStoredUrl } from './api';
 
 type ForegroundCallback = (notification: StoredNotification) => void;
@@ -67,6 +67,7 @@ class NotificationService {
     this.unsubscribeTokenRefresh = onTokenRefresh(
       getMessaging(),
       async newToken => {
+        savePushToken(newToken).catch(() => {});
         heartbeatWithStoredUrl(newToken).catch(() => {});
       },
     );
